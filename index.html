@@ -3,7 +3,7 @@
 <head>
     <title>情緒預測</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
+</head>
 <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; text-align: center; background-color: #f4f4f9; margin: 0; padding: 20px; color: #333;">
 
     <div style="background-color: #ffffff; max-width: 480px; margin: 20px auto; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
@@ -12,9 +12,11 @@
 
         <input type="file" id="imageInput" accept="image/*" style="display: none;">
         
-        <label for="imageInput" style="display: inline-block; padding: 10px 20px; color: #3498db; border: 2px solid #3498db; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 20px;">
+        <label for="imageInput" style="display: inline-block; padding: 10px 20px; color: #3498db; border: 2px solid #3498db; border-radius: 5px; cursor: pointer; font-weight: bold; margin-bottom: 10px;">
             選擇圖片
         </label>
+
+        <span id="fileNameDisplay" style="display: block; color: #555; font-size: 0.9em; margin-bottom: 20px; min-height: 1.2em;"></span>
         
         <button onclick="predict()" style="font-size: 1.2rem; padding: 12px 24px; cursor: pointer; border-radius: 5px; border: 1px solid #777; color: #333; font-weight: bold; display: block; width: 100%; margin-bottom: 20px;">
             開始預測
@@ -35,8 +37,23 @@
     </div>
 
     <script>
+        const fileInput = document.getElementById('imageInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+
+        // 【第二處修改】監聽 input 的 change 事件
+        fileInput.addEventListener('change', function() {
+            if (fileInput.files.length > 0) {
+                // 如果有選擇檔案，就顯示檔案名稱
+                fileNameDisplay.textContent = '已選擇: ' + fileInput.files[0].name;
+            } else {
+                // 如果沒有選擇，就清空文字
+                fileNameDisplay.textContent = '';
+            }
+        });
+
+
         async function predict() {
-            const fileInput = document.getElementById('imageInput');
+            // const fileInput = document.getElementById('imageInput'); // 這行在外面已經宣告過了，可以不用重複
             if (fileInput.files.length === 0) {
                 alert('請先選擇一張圖片！');
                 return;
