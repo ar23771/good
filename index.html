@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>情緒預測</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: sans-serif; text-align: center; padding: 1rem; }
+        #resultImage { max-width: 100%; margin-top: 1rem; border: 1px solid #ccc; }
+        button { font-size: 1.2rem; padding: 0.5rem 1rem; }
+    </style>
+</head>
+<body>
+    <h1>情緒預測 App</h1>
+    <input type="file" id="imageInput" accept="image/*">
+    <button onclick="predict()">開始預測</button>
+    <hr>
+    <h2>最終判斷: <span id="resultText">---</span></h2>
+    <div id="loader" style="display:none;">處理中，請稍候... (樹莓派運算較慢)</div>
+    <img id="resultImage" src="">
+
+    <script>
+        async function predict() {
+            const fileInput = document.getElementById('imageInput');
+            if (fileInput.files.length === 0) {
+                alert('請先選擇一張圖片！');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+            
+            // ## 重要：這裡要換成你從 ngrok 拿到的公開網址 ##
+            const API_URL = 'https://6b2038613826.ngrok-free.app/predict';
+
+            document.getElementById('resultText').innerText = '---';
+            document.getElementById('resultImage').src = '';
+            document.getElementById('loader').style.display = 'block';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                document.getElementById('resultText').innerText = data.final_prediction;
+                document.getElementById('resultImage').src = 'data:image/jpeg;base64,' + data.annotated_image;
+
+            } catch (error) {
+                console.error('Error:', error);
+                alert('預測失敗，請檢查後端服務或網路連線。');
+                document.getElementById('resultText').innerText = '錯誤';
+            } finally {
+                document.getElementById('loader').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
